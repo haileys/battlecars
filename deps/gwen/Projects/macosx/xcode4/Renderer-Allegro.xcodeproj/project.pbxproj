@@ -1,0 +1,236 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		63995B100CD5280A320D01D6 /* Allegro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D0B5D557EDD0E665F162847 /* Allegro.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2D0B5D557EDD0E665F162847 /* Allegro.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "Allegro.cpp"; path = "../../../Renderers/Allegro/Allegro.cpp"; sourceTree = "<group>"; };
+		15A67981343E68C770D772D6 /* libGWEN-Renderer-Allegro.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = "libGWEN-Renderer-Allegro.a"; path = "libGWEN-Renderer-Allegro.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		20A76AB744E9596302491E36 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		254A2EF23FE1026C22AB37D3 /* Renderer-Allegro */ = {
+			isa = PBXGroup;
+			children = (
+				3A62053C4DA45B7C66D13283 /* Renderers */,
+				0EB138582381173E0ED00670 /* Products */,
+			);
+			name = "Renderer-Allegro";
+			sourceTree = "<group>";
+		};
+		3A62053C4DA45B7C66D13283 /* Renderers */ = {
+			isa = PBXGroup;
+			children = (
+				550213D134F3795C11577803 /* Allegro */,
+			);
+			name = "Renderers";
+			sourceTree = "<group>";
+		};
+		550213D134F3795C11577803 /* Allegro */ = {
+			isa = PBXGroup;
+			children = (
+				2D0B5D557EDD0E665F162847 /* Allegro.cpp */,
+			);
+			name = "Allegro";
+			sourceTree = "<group>";
+		};
+		0EB138582381173E0ED00670 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				15A67981343E68C770D772D6 /* libGWEN-Renderer-Allegro.a */,
+			);
+			name = "Products";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A1E72C248CA5CC51E2A78B9 /* Renderer-Allegro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50B1470A03CA4DC362995093 /* Build configuration list for PBXNativeTarget "Renderer-Allegro" */;
+			buildPhases = (
+				05C1533C14664ECE48915E3B /* Resources */,
+				115164C15E370C484BA831FA /* Sources */,
+				20A76AB744E9596302491E36 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Renderer-Allegro";
+			productName = "Renderer-Allegro";
+			productReference = 15A67981343E68C770D772D6 /* libGWEN-Renderer-Allegro.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "Renderer-Allegro" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 254A2EF23FE1026C22AB37D3 /* Renderer-Allegro */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6A1E72C248CA5CC51E2A78B9 /* libGWEN-Renderer-Allegro.a */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		05C1533C14664ECE48915E3B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		115164C15E370C484BA831FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63995B100CD5280A320D01D6 /* Allegro.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4900310F71181EE9612F160B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../../../lib/macosx;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "GWEN-Renderer-Allegro";
+			};
+			name = "Release";
+		};
+		67D37AFF1692761D1D5B7D92 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../../../lib/macosx;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = "GWEN-Renderer-Allegro";
+			};
+			name = "Debug";
+		};
+		4AB22AD668EA7A1B0B9A5740 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"NDEBUG",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../../include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../../lib",
+					"../../../lib/macosx",
+				);
+				OBJROOT = "obj/Release/Renderer-Allegro";
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = (
+					"-ffast-math",
+				);
+				PREBINDING = NO;
+				SYMROOT = "../../../lib/macosx";
+			};
+			name = "Release";
+		};
+		3DC50FCF7CF53D6E1CDB0912 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_DEBUG",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"../../../include",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"../../../lib",
+					"../../../lib/macosx",
+				);
+				OBJROOT = "obj/Debug/Renderer-Allegro";
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SYMROOT = "../../../lib/macosx";
+			};
+			name = "Debug";
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		50B1470A03CA4DC362995093 /* Build configuration list for PBXNativeTarget "libGWEN-Renderer-Allegro.a" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4900310F71181EE9612F160B /* Release */,
+				67D37AFF1692761D1D5B7D92 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "Renderer-Allegro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4AB22AD668EA7A1B0B9A5740 /* Release */,
+				3DC50FCF7CF53D6E1CDB0912 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = "Release";
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
