@@ -1,7 +1,7 @@
 #include "client/single_player.hh"
 #define _USE_MATH_DEFINES
 #include <cmath>
-
+#include <cstdio>
 #include <Gwen/Skin.h>
 #include <Gwen/Skins/Simple.h>
 #include <Gwen/Skins/TexturedBase.h>

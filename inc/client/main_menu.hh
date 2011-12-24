@@ -3,11 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Drawable.hpp>
-#include "client/ui/main_menu.hh"
 #include "client/scene.hh"
 #include <vector>
+#include <Gwen/Events.h>
 
-class MainMenu : public Scene
+class MainMenu : public Scene, public Gwen::Event::Handler
 {
     struct Car
     {
@@ -21,7 +21,12 @@ class MainMenu : public Scene
           
     sf::Image background_image;
     sf::Sprite background;
-    UI::MainMenu main_menu;
+    
+    sf::String heading;
+    Gwen::Controls::Button* singlePlayerButton;
+    Gwen::Controls::Button* quitButton;
+    void singlePlayerButton_OnPress(Gwen::Controls::Base* sender);
+    void quitButton_OnPress(Gwen::Controls::Base* sender);
     
     std::vector<Car> cars;
     

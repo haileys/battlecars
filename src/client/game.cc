@@ -7,6 +7,8 @@ Game::Game()
     : window(sf::VideoMode(1024, 768), "Battlecars"),
       view(window.GetDefaultView()),
       input(window.GetInput()),
+      scene(NULL),
+      nextScene(NULL),
       gwenRenderer(window),
       gwenCanvas(&gwenSkin)
 {
@@ -36,6 +38,14 @@ void Game::SetScene(Scene* _scene)
         delete scene;
     }
     scene = _scene;
+}
+
+void Game::SetSceneWhenSafe(Scene* _scene)
+{
+	if(nextScene) {
+		delete nextScene;
+	}
+	nextScene = _scene;
 }
 
 void Game::Draw()
@@ -68,6 +78,11 @@ void Game::DispatchEvent(sf::Event& ev)
     }
 }
 
+void Game::Exit()
+{
+	window.Close();
+}
+
 void Game::Run()
 {
     scene = new MainMenu(*this);
@@ -76,6 +91,10 @@ void Game::Run()
     window.UseVerticalSync(true);
     
     while(window.IsOpened()) {
+    	if(nextScene) {
+    		SetScene(nextScene);
+    		nextScene = NULL;
+    	}
         sf::Event ev;
         while(window.GetEvent(ev)) {
             DispatchEvent(ev);

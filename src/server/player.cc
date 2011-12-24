@@ -1,8 +1,22 @@
 #include "server/player.hh"
 
 Player::Player(Server& _server, uint32_t _id, std::wstring _name)
-    : id(_id), name(_name), x(0), y(0), velocity(0), heading(0), server(_server)
+    : id(_id), name(_name), x(0), y(0), velocity(0), heading(0), server(_server), thread(NULL)
 { }
+
+Player::~Player()
+{
+	sf::Lock lock(thread_mutex);
+	if(thread) {
+		thread.Terminate();
+		delete thread;
+	}
+}
+
+void Player::ThreadFunc(void* ply)
+{
+	Player* player = (Player*)ply;
+}
 
 sf::Packet Player::InfoPacket()
 {

@@ -696,11 +696,12 @@ namespace Gwen
 
 				virtual void DrawListBoxLine( Gwen::Controls::Base* control, bool bSelected, bool bEven )
 				{
-					if ( bSelected )
+					if ( bSelected ) {
 						if ( bEven )
 							return Textures.Input.ListBox.EvenLineSelected.Draw( GetRender(), control->GetRenderBounds() );
 						else 
 							return Textures.Input.ListBox.OddLineSelected.Draw( GetRender(), control->GetRenderBounds() );
+					}
 
 					if ( control->IsHovered() )
 							return Textures.Input.ListBox.Hovered.Draw( GetRender(), control->GetRenderBounds() );

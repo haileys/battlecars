@@ -4,6 +4,7 @@
 class Server;
 
 #include <SFML/Network.hpp>
+#include <SFML/System.hpp>
 #include "server/player.hh"
 #include <string>
 #include <map>
@@ -15,7 +16,7 @@ class Server
     uint16_t port;
     std::wstring motd;
     sf::SocketTCP listener;
-    sf::Selector<sf::SocketTCP> selector;
+    sf::Mutex mutex;
     std::map<uint32_t, Player> players;
     std::map<sf::SocketTCP, uint32_t> sockets_ids;
     std::map<sf::SocketTCP, sf::IPAddress> accepted;

@@ -26,6 +26,7 @@ public:
     sf::Clock clock;
     float next_tick_at;
     Scene* scene;
+    Scene* nextScene;
     AssetCache assets;
     
     Gwen::Renderer::SFML gwenRenderer;
@@ -38,7 +39,9 @@ public:
     ~Game();
     
     void SetScene(Scene* _scene);
+    void SetSceneWhenSafe(Scene* _scene);
     void Run();
+    void Exit();
     void Draw();
     void DispatchEvent(sf::Event& ev);
 };
