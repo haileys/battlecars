@@ -16,7 +16,7 @@ HERE
 } elsif($platform eq "linux") {
 	$gwen_objs = "deps/gwen/Projects/linux/gmake/obj/Release";
 	print MF <<HERE;
-CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \
+CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \\
     		-I deps/sfml/linux/include -I deps/gwen/include/ -fno-rtti
     		
 LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest \\
