@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "client/game.hh"
 #include "client/scene.hh"
 #include "client/main_menu.hh"
