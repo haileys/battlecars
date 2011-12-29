@@ -4,10 +4,15 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include "client/scene.hh"
+#include "client/server_browser.hh"
 #include <vector>
+#include <Gwen/UnitTest/UnitTest.h>
+#include <Gwen/Controls/WindowControl.h>
+#include <Gwen/Controls/TabControl.h>
+#include <Gwen/Controls/ListBox.h>
 #include <Gwen/Events.h>
 
-class MainMenu : public Scene, public Gwen::Event::Handler
+class MainMenu : public Scene
 {
     struct Car
     {
@@ -22,11 +27,18 @@ class MainMenu : public Scene, public Gwen::Event::Handler
     sf::Image background_image;
     sf::Sprite background;
     
-    sf::String heading;
+    sf::Image heading_image;
+    sf::Sprite heading;
+    
+    Gwen::Font mainButtonFont;
+    Gwen::Controls::Button* serverBrowserButton;
     Gwen::Controls::Button* singlePlayerButton;
     Gwen::Controls::Button* quitButton;
+    void serverBrowserButton_OnPress(Gwen::Controls::Base* sender);
     void singlePlayerButton_OnPress(Gwen::Controls::Base* sender);
     void quitButton_OnPress(Gwen::Controls::Base* sender);
+    
+    ServerBrowser serverBrowser;
     
     std::vector<Car> cars;
     

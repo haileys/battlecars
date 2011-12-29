@@ -5,7 +5,7 @@ class Scene;
 
 #include "client/game.hh"
 
-class Scene
+class Scene : public Gwen::Event::Handler
 {
 protected:
     Game& game;

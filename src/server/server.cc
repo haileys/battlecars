@@ -1,100 +1,142 @@
 #include "server/server.hh"
 #include <iostream>
+#include <sstream>
+#include <cstdlib>
+#include <cstdarg>
+#include <limits>
 
 Server::Server(uint16_t _port)
-    : port(_port), motd(L"Welcome to Battlecars")
+    : client_id_autoinc(1), port(_port)
 {
-    listener.Listen(port);
-    listener.SetBlocking(false);
-    selector.Add(listener);
-}
-
-void Server::AcceptClient()
-{
-    sf::SocketTCP client;
-    sf::IPAddress ip;
-    if(listener.Accept(client, &ip) != sf::Socket::NotReady) {
-        accepted[client] = ip;
-        selector.Add(client);
-        std::wcout << L"Accepted client from ";
-        std::cout << ip.ToString();
-        std::wcout << std::endl;
-    }
-}
-
-void Server::ClientReady(sf::SocketTCP& socket)
-{
-    if(accepted.find(socket) != accepted.end()) {
-        // just connected client has sent a packet
-        sf::SocketTCP sock = socket;
-        accepted.erase(socket);
-        sf::Packet packet;
-        if(socket.Receive(packet) == sf::Socket::Done && packet) {
-            uint32_t packet_id;
-            uint32_t player_id;
-            std::wstring player_name;
-            packet >> packet_id >> player_id >> player_name;
-            if(packet && packet_id == PACKET_HANDSHAKE) {
-                if(players.find(player_id) != players.end()) {
-                    sf::Packet kick;
-                    kick << (uint32_t)PACKET_KICK << L"A user with your ID is already playing on this server";
-                    sock.Send(kick);
-                } else {
-                    // successful connect
-                    Player player(*this, player_id, player_name);
-                    std::wcout << L"Player '" << player_name << L"' (" << player_id << L") joined" << std::endl;
-                }
-            }
-        }
-        selector.Remove(sock);
-        sock.Close();
-    }
-}
-
-void Server::Broadcast(sf::Packet packet)
-{
-    for(std::map<uint32_t,Player>::iterator iter = players.begin(); iter != players.end(); ++iter) {
-        iter->second.SendPacket(packet);
-    }
-}
-
-void Server::DisconnectClient(sf::SocketTCP& socket)
-{
-    if(accepted.find(socket) != accepted.end()) {
-        accepted.erase(socket);
-        return;
-    }
-    if(sockets_ids.find(socket) != sockets_ids.end()) {
-        uint32_t player_id = sockets_ids[socket];
-        sockets_ids.erase(socket);
-        players.erase(player_id);
-        socket.Close();
-        sf::Packet notification;
-        notification << (uint32_t)PACKET_PART << player_id;
-        Broadcast(notification);
-        return;
-    }
-}
-
-void Server::Run()
-{
-    running = true;
-    while(running)
-    {
-        size_t ready = selector.Wait();
-        for(size_t i = 0; i < ready; i++) {
-            sf::SocketTCP sock = selector.GetSocketReady(i);
-            if(sock == listener) {
-                AcceptClient();
-            } else {
-                ClientReady(sock);
-            }
-        }
+    if(!listener.Bind(port)) {
+        Fatal("Could not bind to port %d", port);
+    } else {
+        Log("Bound to port %d", port);
     }
 }
 
 Server::~Server()
 {
-    selector.Clear();
-    listener.Close();
+    listener.Unbind();
+}
+
+void Server::Run()
+{
+    Log("Running");
+    while(true) {
+        sf::Packet packet;
+        sf::IPAddress ip;
+        uint16_t _port;
+        if(listener.Receive(packet, ip, _port) == sf::Socket::Done) {
+            std::pair<sf::IPAddress, uint16_t> remote = std::make_pair(ip, _port);
+            if(clients_by_remote_endpoint.find(remote) != clients_by_remote_endpoint.end()) {
+                clients_by_remote_endpoint[remote]->HandlePacket(packet);
+            } else if(pending_clients.find(remote) != pending_clients.end()) {
+                HandlePendingClient(packet, remote);
+            } else {
+                HandleNewClient(packet, ip, _port);
+            }
+        }
+    }
+}
+
+Client* Server::GetClient(uint32_t id)
+{
+    if(clients_by_id.find(id) != clients_by_id.end()) {
+        return clients_by_id[id];
+    } else {
+        return NULL;
+    }
+}
+
+void Server::SendPacket(sf::IPAddress& address, uint16_t _port, sf::Packet& packet)
+{
+    listener.Send(packet, address, _port);
+}
+
+void Server::HandlePendingClient(sf::Packet& packet, std::pair<sf::IPAddress, uint16_t> ip_port)
+{
+    PendingClient p = pending_clients[ip_port];
+    pending_clients.erase(ip_port);
+    uint32_t type, a, b;
+    if(!(packet >> type >> a >> b) || type != PacketTypes::PACKET_HANDSHAKE_NONCE) {
+        return;
+    }
+    // verify that the other end is somewhat smart and not just a dumb udp sender
+    if(!(a == (p.a + p.b) && b == (p.a ^ p.b))) {
+        Warn("'%s' failed nonce. Expected (%d, %d), received (%d, %d)", p.name.c_str(), p.a + p.b, p.a ^ p.b, a, b);
+        return;
+    }
+    // looks like a legit client...
+    Client* client = new Client(*this, ip_port.first, ip_port.second, client_id_autoinc++, p.name);
+    clients_by_remote_endpoint[ip_port] = client;
+    clients_by_id[client->id] = client;
+    // welcome the client
+    sf::Packet welcome;
+    welcome << PacketTypes::PACKET_HANDSHAKE_NONCE << client->id;
+    for(int i = 0; i < 3; i++) {
+        client->Send(welcome);
+    }
+    // broadcast join
+    sf::Packet join;
+    join << PacketTypes::PACKET_JOIN << client->id << client->name << client->x << client->y << client->velocity << client->heading;
+    for(int i = 0; i < 3; i++) {
+        // repeat join packet several times to account for packet loss
+        for(std::map<uint32_t, Client*>::iterator iter = clients_by_id.begin(); iter != clients_by_id.end(); ++iter) {
+            iter->second->Send(join);
+        }
+    }
+    Log("'%s' joined", p.name.c_str());
+}
+
+void Server::HandleNewClient(sf::Packet& packet, sf::IPAddress& ip, uint16_t _port)
+{
+    // handshake properly
+    uint32_t type;
+    std::string name(1,0);
+    if(!(packet >> type) || type != PacketTypes::PACKET_HANDSHAKE || !(packet >> name)) {
+        // if it's just ping packet, pong back to the client
+        if(type == PacketTypes::PACKET_PING) {
+            sf::Packet response;
+            response << PacketTypes::PACKET_PING;
+            SendPacket(ip, _port, response);
+        }
+        return;
+    }
+    // create and register client
+    Log("'%s' handshaking from %s:%d...", name.c_str(), ip.ToString().c_str(), _port);
+    uint32_t a = sf::Randomizer::Random(0, std::numeric_limits<int32_t>::max());
+    uint32_t b = sf::Randomizer::Random(0, std::numeric_limits<int32_t>::max());
+    pending_clients[std::make_pair(ip, _port)] = PendingClient(a, b, name);
+    sf::Packet nonce;
+    nonce << PacketTypes::PACKET_HANDSHAKE << a << b;
+    SendPacket(ip, _port, nonce);
+}
+
+void Server::Log(std::string msg, ...)
+{
+    printf("%09.2f LOG   ", clock.GetElapsedTime());
+    va_list v;
+    va_start(v, msg);
+    vprintf(msg.c_str(), v);
+    printf("\n");
+}
+
+void Server::Warn(std::string msg, ...)
+{
+    printf("%09.2f WARN  ", clock.GetElapsedTime());
+    va_list v;
+    va_start(v, msg);
+    vprintf(msg.c_str(), v);
+    printf("\n");
+}
+
+void Server::Fatal(std::string msg, ...)
+{
+    printf("%09.2f FATAL ", clock.GetElapsedTime());
+    va_list v;
+    va_start(v, msg);
+    vprintf(msg.c_str(), v);
+    printf("\n");
+    exit(1);
 }

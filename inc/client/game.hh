@@ -24,10 +24,14 @@ public:
     sf::View view;
     const sf::Input& input;
     sf::Clock clock;
+    int fps_avg_smooth;
+    float previous_frame;
     float next_tick_at;
     Scene* scene;
     Scene* nextScene;
     AssetCache assets;
+    bool show_fps;
+    sf::String fps_string;
     
     Gwen::Renderer::SFML gwenRenderer;
     Gwen::Skin::TexturedBase gwenSkin;

@@ -7,8 +7,11 @@ Game::Game()
     : window(sf::VideoMode(1024, 768), "Battlecars"),
       view(window.GetDefaultView()),
       input(window.GetInput()),
+      fps_avg_smooth(0),
       scene(NULL),
       nextScene(NULL),
+      show_fps(true),
+      fps_string("", assets.Font("assets/UbuntuMono-R.ttf"), 24),
       gwenRenderer(window),
       gwenCanvas(&gwenSkin)
 {
@@ -23,12 +26,16 @@ Game::Game()
 	gwenCanvas.SetDrawBackground(false);
 	
     gwenInput.Initialize(&gwenCanvas);
+    
+    fps_string.SetPosition(12, window.GetHeight() - 48);
+    fps_string.SetColor(sf::Color(0, 0, 0, 255));
 }
 
 Game::~Game()
 {
     if(scene) {
         delete scene;
+        scene = NULL;
     }
 }
 
@@ -55,6 +62,18 @@ void Game::Draw()
     window.SetView(sf::View(sf::FloatRect(0, 0, window.GetWidth(), window.GetHeight())));
     scene->DrawHud();
     gwenCanvas.RenderCanvas();
+    if(show_fps) {
+        char fps_buff[64];
+        if(fps_avg_smooth == 9) {
+            sprintf(fps_buff, "%.2f fps", 10.0/(clock.GetElapsedTime() - previous_frame));
+            fps_string.SetText(sf::Unicode::Text(fps_buff));
+        }
+        if(fps_avg_smooth == 0) {
+            previous_frame = clock.GetElapsedTime();
+        }
+        window.Draw(fps_string);
+        fps_avg_smooth = (fps_avg_smooth + 1) % 10;
+    }
     window.SetView(view);
     window.Display();
 }
@@ -69,6 +88,7 @@ void Game::DispatchEvent(sf::Event& ev)
             window.Create(sf::VideoMode(ev.Size.Width, ev.Size.Height), "Battlecars");
             view = window.GetDefaultView();
         	gwenCanvas.SetSize(window.GetWidth(), window.GetHeight());
+            fps_string.SetPosition(12, window.GetHeight() - 48);
             // fall-through
         default:
             if(!scene->DispatchEvent(ev)) {
@@ -88,7 +108,7 @@ void Game::Run()
     scene = new MainMenu(*this);
     //scene = new SinglePlayer(*this);
     
-    window.UseVerticalSync(true);
+    //window.UseVerticalSync(true);
     
     while(window.IsOpened()) {
     	if(nextScene) {

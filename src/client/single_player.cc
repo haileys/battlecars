@@ -29,7 +29,7 @@ SinglePlayer::~SinglePlayer()
 void SinglePlayer::Tick()
 {
     if(game.input.IsKeyDown(sf::Key::Up)) {
-        targetVelocity = 450;
+        targetVelocity = 300;
         if(velocity < 0) velocity = 0;
     } else if(game.input.IsKeyDown(sf::Key::Down)) {
         targetVelocity = -300;

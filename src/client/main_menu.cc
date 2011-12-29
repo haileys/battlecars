@@ -8,30 +8,43 @@
 static std::string car_colours[] = { "assets/cars/blue.png", "assets/cars/red.png", "assets/cars/orange.png", "assets/cars/purple.png" };
 
 MainMenu::MainMenu(Game& _game)
-    : Scene(_game), heading("battlecars", game.assets.Font("assets/Ubuntu-R.ttf"), 72)
+    : Scene(_game), serverBrowser(_game, &_game.gwenCanvas)
 {
     background_image.LoadFromFile("assets/bg.png");
     background_image.SetSmooth(false);
     background = sf::Sprite(background_image);
     background.Move(-100, -99);
     
-    heading.SetPosition(40, 100);
-    heading.SetColor(sf::Color(0,0,0,0));
+    heading_image.LoadFromFile("assets/header.png");
+    heading_image.SetSmooth(false);
+    heading = sf::Sprite(heading_image);
+    heading.SetPosition(-10, 84);
+    heading.SetColor(sf::Color(255,255,255,0));
+    
+    mainButtonFont.size = 18;
+    
+    serverBrowserButton = new Gwen::Controls::Button(&game.gwenCanvas);
+    serverBrowserButton->SetText("Server Browser");
+    serverBrowserButton->SetFont(&mainButtonFont);
+    serverBrowserButton->SetPadding(Gwen::Padding(8, 9, 8, 11));
+    serverBrowserButton->SizeToContents();
+    serverBrowserButton->SetPos(40, 200);
+    serverBrowserButton->onPress.Add(this, &MainMenu::serverBrowserButton_OnPress);
     
     singlePlayerButton = new Gwen::Controls::Button(&game.gwenCanvas);
     singlePlayerButton->SetText("Play Singleplayer");
-    singlePlayerButton->GetFont()->size = 24;
-    singlePlayerButton->SetPadding(Gwen::Padding(8, 4, 8, 4));
+    singlePlayerButton->SetFont(&mainButtonFont);
+    singlePlayerButton->SetPadding(Gwen::Padding(8, 8, 8, 8));
     singlePlayerButton->SizeToContents();
-    singlePlayerButton->SetPos(40, 200);
+    singlePlayerButton->SetPos(40, 240);
     singlePlayerButton->onPress.Add(this, &MainMenu::singlePlayerButton_OnPress);
     
     quitButton = new Gwen::Controls::Button(&game.gwenCanvas);
     quitButton->SetText("Quit");
-    quitButton->GetFont()->size = 24;
-    quitButton->SetPadding(Gwen::Padding(8, 4, 8, 4));
+    quitButton->SetFont(&mainButtonFont);
+    quitButton->SetPadding(Gwen::Padding(8, 8, 8, 8));
     quitButton->SizeToContents();
-    quitButton->SetPos(40, 240);
+    quitButton->SetPos(40, 280);
     quitButton->onPress.Add(this, &MainMenu::quitButton_OnPress);
     
     float w = game.window.GetWidth(), h = game.window.GetHeight();
@@ -39,6 +52,26 @@ MainMenu::MainMenu(Game& _game)
         cars.push_back(Car(game.assets.Image(car_colours[i]), sf::Randomizer::Random(0.0, w), sf::Randomizer::Random(0.0, h), 0.0f));
     }
 }
+
+void MainMenu::serverBrowserButton_OnPress(Gwen::Controls::Base* sender)
+{
+    serverBrowser.Show();
+    
+    /*
+    serverBrowser = new Gwen::Controls::WindowControl(&game.gwenCanvas);
+    serverBrowser->SetTitle("Server Browser");
+    serverBrowser->SetPos(160, 160);
+    serverBrowser->SetSize(800, 600);
+    serverBrowser->SetDeleteOnClose(true);
+    
+    new UnitTest(serverBrowser);
+    
+    Gwen::Controls::ListBox* serverList = new Gwen::Controls::ListBox(serverBrowser);
+    serverList->SetBounds(10, 10, 200, 200);
+    serverList->AddItem(L"127.0.0.1");
+    */
+}
+
 void MainMenu::singlePlayerButton_OnPress(Gwen::Controls::Base* sender)
 {
 	game.SetSceneWhenSafe(new SinglePlayer(game));
@@ -52,7 +85,11 @@ void MainMenu::quitButton_OnPress(Gwen::Controls::Base* sender)
 MainMenu::~MainMenu()
 {
 	delete quitButton;
+    quitButton = NULL;
 	delete singlePlayerButton;
+    singlePlayerButton = NULL;
+	delete serverBrowserButton;
+    singlePlayerButton = NULL;
 }
 
 MainMenu::Car::Car(sf::Image& image, float _x, float _y, float _r)

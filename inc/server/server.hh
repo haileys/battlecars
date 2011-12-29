@@ -5,40 +5,35 @@ class Server;
 
 #include <SFML/Network.hpp>
 #include <SFML/System.hpp>
-#include "server/player.hh"
+#include "server/client.hh"
+#include "shared/packet_types.hh"
 #include <string>
 #include <map>
+#include <utility>
 #include <stdint.h>
 
 class Server
 {
-    bool running;
+    uint32_t client_id_autoinc;
     uint16_t port;
-    std::wstring motd;
-    sf::SocketTCP listener;
-    sf::Mutex mutex;
-    std::map<uint32_t, Player> players;
-    std::map<sf::SocketTCP, uint32_t> sockets_ids;
-    std::map<sf::SocketTCP, sf::IPAddress> accepted;
-    
-    void Broadcast(sf::Packet packet);
-    void DisconnectClient(sf::SocketTCP& socket);
-    void AcceptClient();
-    void ClientReady(sf::SocketTCP& socket);
+    sf::SocketUDP listener;
+    std::map<std::pair<sf::IPAddress, uint16_t>, PendingClient> pending_clients;
+    std::map<std::pair<sf::IPAddress, uint16_t>, Client*> clients_by_remote_endpoint;
+    std::map<uint32_t, Client*> clients_by_id;
+    sf::Clock clock;
     
 public:
-    enum PacketType
-    {
-        PACKET_HANDSHAKE        = 1,
-        PACKET_PLAYER_INFO      = 2,
-        PACKET_PLAYER_POSITION  = 3,
-        PACKET_JOIN             = 4,
-        PACKET_PART             = 5,
-        PACKET_KICK             = 6
-    };
+    void Broadcast(sf::Packet& packet);
     
     Server(uint16_t _port);
+    Client* GetClient(uint32_t id);
     void Run();
+    void SendPacket(sf::IPAddress& address, uint16_t _port, sf::Packet& packet);
+    void HandlePendingClient(sf::Packet& packet, std::pair<sf::IPAddress, uint16_t> ip_port);
+    void HandleNewClient(sf::Packet& packet, sf::IPAddress& ip, uint16_t _port);
+    void Log(std::string fmt, ...);
+    void Warn(std::string fmt, ...);
+    void Fatal(std::string fmt, ...);
     ~Server();
 };
 
