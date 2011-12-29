@@ -1,4 +1,5 @@
 #include "server/server.hh"
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
