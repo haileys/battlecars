@@ -47,9 +47,6 @@ MultiPlayer::~MultiPlayer()
     for(std::map<uint32_t, Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
         delete iter->second;
     }
-    for(std::map<uint32_t, sf::Sprite*>::iterator iter = cars.begin(); iter != cars.end(); ++iter) {
-        delete iter->second;
-    }
 }
 
 void MultiPlayer::SendPacket(sf::Packet& packet)
@@ -61,7 +58,6 @@ void MultiPlayer::HandlePacket(sf::Packet& packet)
 {
     uint32_t type;
     if(!(packet >> type)) return;
-    printf("processing packet type %d\n", type);
     switch(type) {
         case PacketTypes::PACKET_HANDSHAKE: {
             uint32_t a, b;
@@ -81,14 +77,17 @@ void MultiPlayer::HandlePacket(sf::Packet& packet)
             std::string name(1, 0);
             float x, y, velocity, heading;
             if(!(packet >> id >> name >> x >> y >> velocity >> heading)) break;
-            players[id] = me = new Player(id, name, x, y, velocity, heading);
-            cars[id] = new sf::Sprite(game.assets.Image("assets/car.png"));
-            cars[id]->SetCenter(32, 32);
+            players[id] = new Player(game, id, name, x, y, velocity, heading);
+            if(my_id == id) {
+                me = players[id];
+            }
+            players[id]->car.SetCenter(32, 32);
         } break;
         case PacketTypes::PACKET_PLAYER_POSITION: {
             uint32_t id;
             float x, y, velocity, heading;
             if(!(packet >> id >> x >> y >> velocity >> heading)) break;
+            if(id == my_id) break;
             if(players.find(id) == players.end()) {
                 // this player existed before joining, so we'll ask for its info
                 // but disregard this packet
@@ -109,9 +108,8 @@ void MultiPlayer::HandlePacket(sf::Packet& packet)
             float x, y, velocity, heading;
             if(!(packet >> id >> name >> x >> y >> velocity >> heading)) break;
             if(players.find(id) == players.end()) {
-                players[id] = me = new Player(id, name, x, y, velocity, heading);
-                cars[id] = new sf::Sprite(game.assets.Image("assets/car.png"));
-                cars[id]->SetCenter(32, 32);
+                players[id] = new Player(game, id, name, x, y, velocity, heading);
+                players[id]->car.SetCenter(32, 32);
             } else {
                 Player& ply = *players[id];
                 ply.x = x;
@@ -120,6 +118,13 @@ void MultiPlayer::HandlePacket(sf::Packet& packet)
                 ply.heading = heading;
             }
         } break;
+        case PacketTypes::PACKET_PART: {
+            uint32_t id;
+            if(!(packet >> id)) break;
+            if(players.find(id) == players.end()) break;
+            delete players[id];
+            players.erase(id);
+        } break;
         default: {
             printf("unknown packet type %d\n", type);
         } break;
@@ -127,7 +132,7 @@ void MultiPlayer::HandlePacket(sf::Packet& packet)
 }
 
 void MultiPlayer::Tick()
-{
+{    
     // handle any incoming packets from the server
     sf::Packet recv;
     sf::IPAddress addr;
@@ -164,6 +169,14 @@ void MultiPlayer::Tick()
         } else {
             me->velocity += 3;
         }
+    }
+    
+    // send server new velocity/heading
+    if(++position_update_tick == 20) {
+        position_update_tick = 0;
+        sf::Packet pos;
+        pos << PacketTypes::PACKET_PLAYER_POSITION << me->x << me->y << me->velocity << me->heading;
+        SendPacket(pos);
     }
     
     // update all players positions based on their velocities and heading
@@ -212,11 +225,13 @@ void MultiPlayer::Draw()
     
     int mid_x = game.window.GetWidth() / 2.0;
     int mid_y = game.window.GetHeight() / 2.0;
-    for(std::map<uint32_t,sf::Sprite*>::iterator iter = cars.begin(); iter != cars.end(); ++iter) {
-        Player& ply = *players[iter->first];
-        iter->second->SetPosition(mid_x + ply.x, mid_y - ply.y);
-        iter->second->SetRotation(-ply.heading * 180.0 / M_PI);
-        game.window.Draw(*iter->second);
+    for(std::map<uint32_t, Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
+        Player& ply = *iter->second;
+        ply.car.SetPosition(mid_x + ply.x, mid_y - ply.y);
+        ply.label.SetPosition(mid_x + ply.x - (ply.label_width / 2), mid_y - ply.y + 32);
+        ply.car.SetRotation(-ply.heading * 180.0 / M_PI);
+        game.window.Draw(ply.car);
+        game.window.Draw(ply.label);
     }
 }
 

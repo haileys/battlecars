@@ -108,7 +108,7 @@ void Game::Run()
     scene = new MainMenu(*this);
     //scene = new SinglePlayer(*this);
     
-    //window.UseVerticalSync(true);
+    window.UseVerticalSync(true);
     
     while(window.IsOpened()) {
     	if(nextScene) {

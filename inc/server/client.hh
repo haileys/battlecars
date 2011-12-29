@@ -21,10 +21,10 @@ class Client
 {    
     Server& server;
     
+public:
     sf::IPAddress address;
     uint16_t port;
     
-public:    
     uint32_t id;
     std::string name;
     float x, y, velocity, heading;

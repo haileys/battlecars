@@ -20,7 +20,7 @@ class MultiPlayer : public Scene
     sf::String coords;
     
     std::map<uint32_t, Player*> players;
-    std::map<uint32_t, sf::Sprite*> cars;
+    int position_update_tick;
     uint32_t my_id;
     Player* me;
     float target_velocity;

@@ -49,9 +49,28 @@ Client* Server::GetClient(uint32_t id)
     }
 }
 
+void Server::Disconnect(uint32_t id)
+{
+    Client* client = clients_by_id[id];
+    clients_by_remote_endpoint.erase(std::make_pair(client->address, client->port));
+    Log("'%s' disconnected", client->name.c_str());
+    delete client;
+    clients_by_id.erase(id);
+    sf::Packet packet;
+    packet << PacketTypes::PACKET_PART << id;
+    Broadcast(packet);
+}
+
 void Server::SendPacket(sf::IPAddress& address, uint16_t _port, sf::Packet& packet)
 {
     listener.Send(packet, address, _port);
+}
+
+void Server::Broadcast(sf::Packet& packet)
+{
+    for(std::map<uint32_t, Client*>::iterator iter = clients_by_id.begin(); iter != clients_by_id.end(); ++iter) {
+        iter->second->Send(packet);
+    }
 }
 
 void Server::HandlePendingClient(sf::Packet& packet, std::pair<sf::IPAddress, uint16_t> ip_port)
@@ -82,9 +101,7 @@ void Server::HandlePendingClient(sf::Packet& packet, std::pair<sf::IPAddress, ui
     join << PacketTypes::PACKET_JOIN << client->id << client->name << client->x << client->y << client->velocity << client->heading;
     for(int i = 0; i < 3; i++) {
         // repeat join packet several times to account for packet loss
-        for(std::map<uint32_t, Client*>::iterator iter = clients_by_id.begin(); iter != clients_by_id.end(); ++iter) {
-            iter->second->Send(join);
-        }
+        Broadcast(join);
     }
     Log("'%s' joined", p.name.c_str());
 }

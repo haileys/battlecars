@@ -37,13 +37,15 @@ sf::Packet Client::PositionPacket()
 void Client::HandlePacket(sf::Packet& packet)
 {
     uint32_t type;
+    if(!(packet >> type)) return;
     switch(type) {
         case PacketTypes::PACKET_PLAYER_INFO: {
             uint32_t req_id;
             if(!(packet >> req_id)) break;
             Client* requested = server.GetClient(req_id);
             if(requested) {
-                Send(requested->InfoPacket());
+                sf::Packet p = requested->InfoPacket();
+                Send(p);
             }
         } break;
         case PacketTypes::PACKET_PLAYER_POSITION: {
@@ -55,8 +57,15 @@ void Client::HandlePacket(sf::Packet& packet)
             y = new_y;
             velocity = new_velocity;
             heading = new_heading;
-            server.Broadcast(PositionPacket());
+            sf::Packet p = PositionPacket();
+            server.Broadcast(p);
         } break;
+        case PacketTypes::PACKET_PART: {
+            // this is the part where we delete ourselves. uh oh!
+            server.Disconnect(id);
+            // now get the fuck out of here
+            return;
+        };
         default: {
             server.Warn("Unknown packet type %d", type);
         } break;

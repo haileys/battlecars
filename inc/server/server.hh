@@ -27,6 +27,7 @@ public:
     
     Server(uint16_t _port);
     Client* GetClient(uint32_t id);
+    void Disconnect(uint32_t id);
     void Run();
     void SendPacket(sf::IPAddress& address, uint16_t _port, sf::Packet& packet);
     void HandlePendingClient(sf::Packet& packet, std::pair<sf::IPAddress, uint16_t> ip_port);
