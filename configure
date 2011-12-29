@@ -19,7 +19,7 @@ HERE
 CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \\
     		-I deps/sfml/linux/include -I deps/gwen/include/ -fno-rtti
     		
-LDFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest \\
+LDFLAGS=-Ldeps/sfml/linux/lib/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest \\
 		$gwen_objs/Renderer-SFML/*.o $gwen_objs/GWEN\\ Static/*.o
 
 HERE
