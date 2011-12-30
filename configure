@@ -7,17 +7,18 @@ open MF, ">Makefile";
 if($platform eq "osx") {
 	print MF <<'HERE';
 CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \
-    		-I deps/sfml/mac/include -I deps/gwen/include/ -fno-rtti
+    		-I deps/sfml/mac/include -I deps/gwen/include/ -fno-rtti -I deps/v8/include/
     		
 LDFLAGS=-framework SFML -framework sfml-graphics -framework sfml-window -framework sfml-system -framework sfml-network \
-				-framework OpenGL -Ldeps/gwen/lib/macosx/ -lgwen_static -lunittest -lGWEN-Renderer-SFML
+				-framework OpenGL -Ldeps/gwen/lib/macosx/ -lgwen_static -lunittest -lGWEN-Renderer-SFML \
+				
 				
 HERE
 } elsif($platform eq "linux") {
 	$gwen_objs = "deps/gwen/Projects/linux/gmake/obj/Release";
 	print MF <<HERE;
 CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \\
-    		-I deps/sfml/linux/include -I deps/gwen/include/ -fno-rtti
+    		-I deps/sfml/linux/include -I deps/gwen/include/ -fno-rtti -I deps/v8/include/
     		
 LDFLAGS=-Ldeps/sfml/linux/lib/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest \\
 		$gwen_objs/Renderer-SFML/*.o $gwen_objs/GWEN\\ Static/*.o

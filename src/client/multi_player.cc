@@ -226,12 +226,7 @@ void MultiPlayer::Draw()
     int mid_x = game.window.GetWidth() / 2.0;
     int mid_y = game.window.GetHeight() / 2.0;
     for(std::map<uint32_t, Player*>::iterator iter = players.begin(); iter != players.end(); ++iter) {
-        Player& ply = *iter->second;
-        ply.car.SetPosition(mid_x + ply.x, mid_y - ply.y);
-        ply.label.SetPosition(mid_x + ply.x - (ply.label_width / 2), mid_y - ply.y + 32);
-        ply.car.SetRotation(-ply.heading * 180.0 / M_PI);
-        game.window.Draw(ply.car);
-        game.window.Draw(ply.label);
+        iter->second->Render(game.window, mid_x, mid_y);
     }
 }
 
