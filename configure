@@ -5,41 +5,56 @@ $platform = shift or die "no platform specified, use one of: osx, linux\n";
 open MF, ">Makefile";
 
 if($platform eq "osx") {
-	print MF <<'HERE';
-CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \
-    		-I deps/sfml/mac/include -I deps/gwen/include/ -fno-rtti -I deps/v8/include/
-    		
-LDFLAGS=-framework SFML -framework sfml-graphics -framework sfml-window -framework sfml-system -framework sfml-network \
-				-framework OpenGL -Ldeps/gwen/lib/macosx/ -lgwen_static -lunittest -lGWEN-Renderer-SFML \
-				
-				
-HERE
+	$PLATFORM_CXXFLAGS = "-I deps/sfml/mac/include -I deps/gwen/include/ -fno-rtti";
+	$PLATFORM_LDFLAGS = "-Fdeps/sfml/mac/lib/ub32+64/ -Ldeps/sfml/mac/lib/ub32+64/ -framework SFML -framework sfml-graphics -framework sfml-window -framework sfml-system -framework sfml-network ".
+						"-framework OpenGL -Ldeps/gwen/lib/macosx/ -lgwen_static -lunittest -lGWEN-Renderer-SFML";
+	$PLATFORM_RELEASE = <<SH;
+	cp deps/sfml/mac/lib/ub32+64/sfml-audio.framework/sfml-audio build/$platform/lib
+	cp deps/sfml/mac/lib/ub32+64/sfml-network.framework/sfml-network build/$platform/lib
+	cp deps/sfml/mac/lib/ub32+64/sfml-window.framework/sfml-window build/$platform/lib
+	cp deps/sfml/mac/lib/ub32+64/sfml-system.framework/sfml-system build/$platform/lib
+	cp deps/sfml/mac/lib/ub32+64/sfml-graphics.framework/sfml-graphics build/$platform/lib
+	cp deps/sfml/mac/lib/ub32+64/SFML.framework/SFML build/$platform/lib
+SH
 } elsif($platform eq "linux") {
 	$gwen_objs = "deps/gwen/Projects/linux/gmake/obj/Release";
-	print MF <<HERE;
-CXXFLAGS=-g -pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/ \\
-    		-I deps/sfml/linux/include -I deps/gwen/include/ -fno-rtti -I deps/v8/include/
-    		
-LDFLAGS=-Ldeps/sfml/linux/lib/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest \\
-		$gwen_objs/Renderer-SFML/*.o $gwen_objs/GWEN\\ Static/*.o
-
-HERE
+	$PLATFORM_CXXFLAGS = "-I deps/sfml/linux/include -I deps/gwen/include/ -fno-rtti";
+	$PLATFORM_LDFLAGS = "-Ldeps/sfml/linux/lib/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest ".
+						"$gwen_objs/Renderer-SFML/*.o $gwen_objs/GWEN\\ Static/*.o";
+	$PLATFORM_RELEASE = <<SH;
+	#todo
+SH
 }
 
-print MF <<'HERE';
+$CXXFLAGS = "-pedantic -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wextra -Werror -Wno-unused-parameter -Wno-unused-function -iquote inc/";
+$LDFLAGS = "";
+
+print MF <<HERE;
+CXXFLAGS=-g $CXXFLAGS $PLATFORM_CXXFLAGS
+LDFLAGS=$LDFLAGS $PLATFORM_LDFLAGS
+
 all: client server
+
+release:
+	\@make clean
+	make all CXXFLAGS='-O3 $CXXFLAGS $PLATFORM_CXXFLAGS'
+	\@mkdir build/$platform/lib || true
+$PLATFORM_RELEASE
+	cp -fr assets build/$platform
+	cp client server build/$platform
+	chmod +x build/$platform/start-*
 
 clean:
 	rm -f src/client/*.o src/client/**/*.o src/server/*.o src/server/**/*.o client server
 
-client: src/client/main.o src/client/game.o src/client/scene.o src/client/single_player.o \
-		src/client/main_menu.o src/client/asset_cache.o src/client/server_browser.o \
+client: src/client/main.o src/client/game.o src/client/scene.o src/client/single_player.o \\
+		src/client/main_menu.o src/client/asset_cache.o src/client/server_browser.o \\
 		src/client/multi_player.o src/client/player.o
-	g++ $(CXXFLAGS) $(LDFLAGS) -o client src/client/*.o #src/client/**/*.o
+	g++ \$(CXXFLAGS) \$(LDFLAGS) -o client src/client/*.o #src/client/**/*.o
 
 server: src/server/main.o src/server/client.o src/server/server.o
-	g++ $(CXXFLAGS) $(LDFLAGS) -o server src/server/*.o #src/server/**/*.o
+	g++ \$(CXXFLAGS) \$(LDFLAGS) -o server src/server/*.o #src/server/**/*.o
 
-src/%.o: src/%.cc inc/*.hh
+src/\%.o: src/\%.cc inc/*.hh
 HERE
 
