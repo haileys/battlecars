@@ -1,1 +1,1 @@
-DYLD_LIBRARY_PATH=lib ./client
+DYLD_LIBRARY_PATH=lib ./server
