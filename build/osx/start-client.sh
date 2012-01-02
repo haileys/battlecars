@@ -1,0 +1,1 @@
+DYLD_LIBRARY_PATH=lib ./client
