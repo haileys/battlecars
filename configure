@@ -22,7 +22,7 @@ SH
 	$PLATFORM_LDFLAGS = "-Ldeps/sfml/linux/lib/ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-network -lGL -Ldeps/gwen/lib/linux/ -lunittest ".
 						"$gwen_objs/Renderer-SFML/*.o $gwen_objs/GWEN\\ Static/*.o";
 	$PLATFORM_RELEASE = <<SH;
-	#todo
+	cp deps/sfml/mac/lib/ub32+64/*.so build/$platform/lib
 SH
 }
 
