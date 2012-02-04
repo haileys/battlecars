@@ -8,7 +8,7 @@
 static std::string car_colours[] = { "assets/cars/blue.png", "assets/cars/red.png", "assets/cars/orange.png", "assets/cars/purple.png" };
 
 MainMenu::MainMenu(Game& _game)
-    : Scene(_game), serverBrowser(_game, &_game.gwenCanvas)
+    : Scene(_game), serverBrowser(_game, &_game.gwenCanvas), optionsWindow(_game, &_game.gwenCanvas)
 {
     background_image.LoadFromFile("assets/bg.png");
     background_image.SetSmooth(false);
@@ -39,12 +39,20 @@ MainMenu::MainMenu(Game& _game)
     singlePlayerButton->SetPos(40, 240);
     singlePlayerButton->onPress.Add(this, &MainMenu::singlePlayerButton_OnPress);
     
+    optionsButton = new Gwen::Controls::Button(&game.gwenCanvas);
+    optionsButton->SetText("Options");
+    optionsButton->SetFont(&mainButtonFont);
+    optionsButton->SetPadding(Gwen::Padding(8, 8, 8, 8));
+    optionsButton->SizeToContents();
+    optionsButton->SetPos(40, 280);
+    optionsButton->onPress.Add(this, &MainMenu::optionsButton_OnPress);
+
     quitButton = new Gwen::Controls::Button(&game.gwenCanvas);
     quitButton->SetText("Quit");
     quitButton->SetFont(&mainButtonFont);
     quitButton->SetPadding(Gwen::Padding(8, 8, 8, 8));
     quitButton->SizeToContents();
-    quitButton->SetPos(40, 280);
+    quitButton->SetPos(40, 320);
     quitButton->onPress.Add(this, &MainMenu::quitButton_OnPress);
     
     float w = game.window.GetWidth(), h = game.window.GetHeight();
@@ -56,25 +64,16 @@ MainMenu::MainMenu(Game& _game)
 void MainMenu::serverBrowserButton_OnPress(Gwen::Controls::Base* sender)
 {
     serverBrowser.Show();
-    
-    /*
-    serverBrowser = new Gwen::Controls::WindowControl(&game.gwenCanvas);
-    serverBrowser->SetTitle("Server Browser");
-    serverBrowser->SetPos(160, 160);
-    serverBrowser->SetSize(800, 600);
-    serverBrowser->SetDeleteOnClose(true);
-    
-    new UnitTest(serverBrowser);
-    
-    Gwen::Controls::ListBox* serverList = new Gwen::Controls::ListBox(serverBrowser);
-    serverList->SetBounds(10, 10, 200, 200);
-    serverList->AddItem(L"127.0.0.1");
-    */
 }
 
 void MainMenu::singlePlayerButton_OnPress(Gwen::Controls::Base* sender)
 {
 	game.SetSceneWhenSafe(new SinglePlayer(game));
+}
+
+void MainMenu::optionsButton_OnPress(Gwen::Controls::Base* sender)
+{
+	optionsWindow.Show();
 }
 
 void MainMenu::quitButton_OnPress(Gwen::Controls::Base* sender)
@@ -86,6 +85,8 @@ MainMenu::~MainMenu()
 {
 	delete quitButton;
     quitButton = NULL;
+	delete optionsButton;
+    optionsButton = NULL;
 	delete singlePlayerButton;
     singlePlayerButton = NULL;
 	delete serverBrowserButton;

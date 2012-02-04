@@ -5,7 +5,8 @@
 #include "client/single_player.hh"
 
 Game::Game()
-    : window(sf::VideoMode(1024, 768), "Battlecars"),
+    : config("client.cfg"),
+	  window(sf::VideoMode(1024, 768), "Battlecars"),
       view(window.GetDefaultView()),
       input(window.GetInput()),
       fps_avg_smooth(0),
@@ -18,7 +19,7 @@ Game::Game()
 {
     next_tick_at = clock.GetElapsedTime();
     
-    // piece of shit gwen library initialization    
+    // piece of shit gwen library initialization
     gwenSkin.SetRender(&gwenRenderer);
     gwenSkin.Init("assets/DefaultSkin.png");
 	gwenSkin.SetDefaultFont( L"assets/OpenSans.ttf", 11 );
@@ -46,6 +47,7 @@ void Game::SetScene(Scene* _scene)
         delete scene;
     }
     scene = _scene;
+    window.SetView(view = sf::View(sf::FloatRect(0, 0, window.GetWidth(), window.GetHeight())));
 }
 
 void Game::SetSceneWhenSafe(Scene* _scene)
@@ -56,13 +58,17 @@ void Game::SetSceneWhenSafe(Scene* _scene)
 	nextScene = _scene;
 }
 
+void Game::ExitToMainMenu()
+{
+    SetSceneWhenSafe(new MainMenu(*this));
+}
+
 void Game::Draw()
 {    
     window.Clear();
     scene->Draw();    
     window.SetView(sf::View(sf::FloatRect(0, 0, window.GetWidth(), window.GetHeight())));
     scene->DrawHud();
-    gwenCanvas.RenderCanvas();
     if(show_fps) {
         char fps_buff[64];
         if(fps_avg_smooth == 9) {
@@ -75,6 +81,7 @@ void Game::Draw()
         window.Draw(fps_string);
         fps_avg_smooth = (fps_avg_smooth + 1) % 10;
     }
+    gwenCanvas.RenderCanvas();
     window.SetView(view);
     window.Display();
 }

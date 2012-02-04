@@ -1,6 +1,8 @@
-#include "client/server_browser.hh"
+#include "client/ui/server_browser.hh"
 #include "client/multi_player.hh"
 #include <SFML/Network.hpp>
+
+using namespace UI;
 
 ServerBrowser::ServerBrowser(Game& _game, Gwen::Controls::Canvas* _canvas)
     : game(_game), canvas(_canvas)

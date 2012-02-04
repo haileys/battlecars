@@ -1,0 +1,6 @@
+if [ "$1" == "-g" ]
+then
+	DYLD_LIBRARY_PATH=build/osx/lib gdb ./client
+else
+	DYLD_LIBRARY_PATH=build/osx/lib ./client
+fi

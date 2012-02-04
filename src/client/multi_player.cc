@@ -10,7 +10,8 @@
 #include <Gwen/UnitTest/UnitTest.h>
 
 MultiPlayer::MultiPlayer(Game& _game, sf::IPAddress& _server_ip, uint16_t _server_port)
-    : Scene(_game), server_ip(_server_ip), server_port(_server_port), me(NULL)
+    : Scene(_game), server_ip(_server_ip), server_port(_server_port), me(NULL),
+      confirmExit(&_game.gwenCanvas, "Are you sure you want to leave this game?", "Leave", "Keep Playing")
 {
     while(true) {
         uint16_t port = sf::Randomizer::Random(20000, 65535);
@@ -20,7 +21,7 @@ MultiPlayer::MultiPlayer(Game& _game, sf::IPAddress& _server_ip, uint16_t _serve
     printf("connecting to %s:%d\n", server_ip.ToString().c_str(), server_port);
     
     sf::Packet handshake;
-    handshake << PacketTypes::PACKET_HANDSHAKE << std::string("Dumb Schmuck");
+    handshake << PacketTypes::PACKET_HANDSHAKE << game.config.Name();
     SendPacket(handshake);
     
     background_image.LoadFromFile("assets/bg2.png");
@@ -28,13 +29,11 @@ MultiPlayer::MultiPlayer(Game& _game, sf::IPAddress& _server_ip, uint16_t _serve
     background = sf::Sprite(background_image);
     background.Move(-100, -99);
     
-    /*
-    car = sf::Sprite(game.assets.Image("assets/car.png"));
-    car.SetCenter(32, 32);
-    */
-    
     coords = sf::String("", game.assets.Font("assets/UbuntuMono-R.ttf"), 24);
     coords.SetColor(sf::Color(0, 0, 0, 255));
+    
+    confirmExit.SetOptionAHandler(this, &MultiPlayer::confirmExit_Exit_OnPress);
+    confirmExit.SetOptionBHandler(this, &MultiPlayer::confirmExit_Cancel_OnPress);
 }
 
 MultiPlayer::~MultiPlayer()
@@ -49,8 +48,19 @@ MultiPlayer::~MultiPlayer()
     }
 }
 
+void MultiPlayer::confirmExit_Exit_OnPress(Gwen::Controls::Base* sender)
+{
+    game.ExitToMainMenu();
+}
+
+void MultiPlayer::confirmExit_Cancel_OnPress(Gwen::Controls::Base* sender)
+{
+    confirmExit.Hide();
+}
+
 void MultiPlayer::SendPacket(sf::Packet& packet)
 {
+    fprintf(stderr, "                %x\n", ((uint8_t*)packet.GetData())[3]);
     server.Send(packet, server_ip, server_port);
 }
 
@@ -132,7 +142,12 @@ void MultiPlayer::HandlePacket(sf::Packet& packet)
 }
 
 void MultiPlayer::Tick()
-{    
+{
+    // check if escape key is pressed
+    if(game.input.IsKeyDown(sf::Key::Escape)) {
+        confirmExit.Show();
+    }
+    
     // handle any incoming packets from the server
     sf::Packet recv;
     sf::IPAddress addr;
@@ -172,7 +187,7 @@ void MultiPlayer::Tick()
     }
     
     // send server new velocity/heading
-    if(++position_update_tick == 20) {
+    if(++position_update_tick == 10) {
         position_update_tick = 0;
         sf::Packet pos;
         pos << PacketTypes::PACKET_PLAYER_POSITION << me->x << me->y << me->velocity << me->heading;
@@ -194,13 +209,7 @@ void MultiPlayer::Tick()
 
 void MultiPlayer::DrawHud()
 {
-    /*
-    char coords_buff[64];
-    sprintf(coords_buff, "(%d, %d), %d\n%.2f km/h", (int)x, (int)y, (int)(-heading * 180.0 / M_PI) % 360, (velocity / 15.0) * 3.6);
-    coords.SetText(sf::Unicode::Text(coords_buff));
-    coords.SetPosition(16, 8);
-    game.window.Draw(coords);
-    */
+    
 }
 
 void MultiPlayer::Draw()

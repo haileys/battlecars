@@ -36,7 +36,9 @@ sf::Packet Client::PositionPacket()
 
 void Client::HandlePacket(sf::Packet& packet)
 {
-    uint32_t type;
+//    fprintf(stderr, "                %x\n", *(uint32_t*)packet.GetData());
+    
+    uint32_t type = 0;
     if(!(packet >> type)) return;
     switch(type) {
         case PacketTypes::PACKET_PLAYER_INFO: {
@@ -52,7 +54,7 @@ void Client::HandlePacket(sf::Packet& packet)
             // @TODO implement sanity checks for max velocity vs. position delta
             // @TODO rate limit broadcasts to other clients
             float new_x, new_y, new_velocity, new_heading;
-            if(!(packet >> new_x >> new_y >> new_velocity >> new_heading)) break;
+            if(!(packet >> new_x >> new_y >> new_velocity >> new_heading)) return;
             x = new_x;
             y = new_y;
             velocity = new_velocity;
@@ -67,7 +69,7 @@ void Client::HandlePacket(sf::Packet& packet)
             return;
         };
         default: {
-            server.Warn("Unknown packet type %d", type);
+            server.Warn("Unknown packet type %d from %s", type, name.c_str());
         } break;
     }
 }

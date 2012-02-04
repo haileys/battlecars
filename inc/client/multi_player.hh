@@ -3,6 +3,7 @@
 
 #include "client/scene.hh"
 #include "client/player.hh"
+#include "client/ui/confirm.hh"
 #include <SFML/Network.hpp>
 #include <stdint.h>
 #include <map>
@@ -24,6 +25,10 @@ class MultiPlayer : public Scene
     uint32_t my_id;
     Player* me;
     float target_velocity;
+    
+    UI::Confirm confirmExit;
+    void confirmExit_Exit_OnPress(Gwen::Controls::Base* sender);
+    void confirmExit_Cancel_OnPress(Gwen::Controls::Base* sender);
     
 public:
     void SendPacket(sf::Packet& packet);

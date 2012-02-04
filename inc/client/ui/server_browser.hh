@@ -10,6 +10,9 @@
 
 #include "client/game.hh"
 
+namespace UI
+{
+    
 class ServerBrowser : public Gwen::Event::Handler
 {    
     Game& game;
@@ -24,5 +27,7 @@ public:
     void Show();
     void playOnLocalhost(Gwen::Controls::Base* sender);
 };
+
+}
 
 #endif

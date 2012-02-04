@@ -4,7 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include "client/scene.hh"
-#include "client/server_browser.hh"
+#include "client/ui/server_browser.hh"
+#include "client/ui/options_window.hh"
 #include <vector>
 #include <Gwen/UnitTest/UnitTest.h>
 #include <Gwen/Controls/WindowControl.h>
@@ -33,12 +34,15 @@ class MainMenu : public Scene
     Gwen::Font mainButtonFont;
     Gwen::Controls::Button* serverBrowserButton;
     Gwen::Controls::Button* singlePlayerButton;
+    Gwen::Controls::Button* optionsButton;
     Gwen::Controls::Button* quitButton;
     void serverBrowserButton_OnPress(Gwen::Controls::Base* sender);
     void singlePlayerButton_OnPress(Gwen::Controls::Base* sender);
+    void optionsButton_OnPress(Gwen::Controls::Base* sender);
     void quitButton_OnPress(Gwen::Controls::Base* sender);
     
-    ServerBrowser serverBrowser;
+    UI::ServerBrowser serverBrowser;
+    UI::OptionsWindow optionsWindow;
     
     std::vector<Car> cars;
     

@@ -14,12 +14,14 @@ class Game;
 #include <Gwen/UnitTest/UnitTest.h>
 #include "client/scene.hh"
 #include "client/asset_cache.hh"
+#include "client/config.hh"
 
 class Game
 {    
 public:
     static const int TICKS_PER_SECOND = 100;
     
+	Config config;
     sf::RenderWindow window;
     sf::View view;
     const sf::Input& input;
@@ -44,6 +46,7 @@ public:
     
     void SetScene(Scene* _scene);
     void SetSceneWhenSafe(Scene* _scene);
+    void ExitToMainMenu();
     void Run();
     void Exit();
     void Draw();
